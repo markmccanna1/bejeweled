@@ -1,0 +1,53 @@
+you can solve many of the problems of multiple display resolutions by using an elastic layout
+based on relative units, instead of absolute values
+
+
+some relative units are %'s and ems
+
+  percentages: setting the width property of an element to 25% makes the element use 25% of its parents
+  width
+
+
+  em: one em is equal to the height of the font
+
+
+ems are ridiculously useful:
+  you can set a main font size that all content inherits from, which standardizes ems across the app
+
+
+
+  this means that you have to choose a font-size that makes sense
+  normally you choose a size that divides up the display into a nice grid
+
+
+  jewel warrior uses a 8x8 board and the game width is set to 320px, if the game takes up 
+  all of the width, a font-size value of 40 pixels whould mean that each cell on the board is
+  a 1x1 em block
+
+
+
+to really udnerstant the way that mobile devices display web content, you need 
+to understand what the viewport is and how it relates to the page
+
+you can think of the viewport as the area on which the browser renders the page
+
+the dimenstions of the viewport and the dimensions of the hole through which
+the page is viewed are not the same thing
+
+
+in desktop browsers, the width of the viewport is generally equal to the width of browser window
+
+the viewport of a site can be controlled with a meta tag
+
+  <meta name="viewport" content="...">
+
+
+to make your views scalable, you usually want to use special device-width and device-height values 
+in the viewport tag, 
+
+  this way, the device can automatically scale the content to fill the screen
+
+
+
+its a good idea to disable user scaling in the game, this wil lstop them from accidentally zooming in
+

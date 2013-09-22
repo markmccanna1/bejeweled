@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+}
+
+#game {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 40px;
+  width: 8em;
+  height: 12em;
+  background-color: rgb(30,30,30);
+  font-family : Geo;
+  color: rgb(200,200,100);
+}
+
+#game .screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 10;
+}
+
+#game .screen.active {
+  display: block;
+}
+
+
+#splash-screen {
+  text-align: center;
+  padding-top: 2.5em;
+}
+
+#splash-screen .continue {
+  cursor: pointer;
+  font-size: .75em;
+}
+
+.logo {
+  /*because the logo has its own font size, the rest of the values specified in ems
+  are now relative to that font-size value*/
+  font-family: Slackey;
+  font-size: 1.5em;
+  line-height: .9em;
+  margin: 0;
+  text-align: center;
+  color: rgb(70,120,20);
+  text-shadow: .03em .03em .03em rgb(255,255,0),
+  -.03em -.03em .03em rgb(255,255,0),
+  .1em .15em .15em rgb(0,0,0);
+}
+
+
+
+
+#main-menu {
+  padding-top: 1em;
+}
+
+ul.menu {
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+ul.menu li {
+  margin: .8em 0 ;
+}
+
+ul.menu li button {
+  font-family: Slackey, sans-serif;
+  font-size: .6em;
+  color: rgb(100,120,0);
+  width: 10em;
+  height: 1.5em;
+  background: rgb(10,20,0);
+  border: .1em solid rgb(255,255,0);
+  border-radius: .5em;
+  -webkit-box-shadow: .2em .2em .3em rgb(0,0,0);
+  -mox-box-shadow: .2em .2em .3em rgb(0,0,0);
+  box-shadow: .2em .2em .3em rgb(0,0,0);
+}
+
+/* em units are based on an elements text size, since this elements font size is specified in
+em units, the actual calculated font size for the buttons is equal to the inherited font-size value
+multiplied by its own font-size value*/
+ul.menu li button:hover {
+  background: rgb(30,40,0);
+}
+
+ul.menu li button:active {
+  color: rgb(255,255,0);
+  background: rgb(30,40,0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
