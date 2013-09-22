@@ -51,3 +51,120 @@ in the viewport tag,
 
 its a good idea to disable user scaling in the game, this wil lstop them from accidentally zooming in
 
+
+
+
+no matter how hard you try, sometimes you just cant make a single set of css rules behave properly across
+all devices and resolutions
+
+sometimes, the best solution is to make seperate stylesheets for different display sizes and load
+the appropriate ones when needed, 
+
+you can make media queries to decide which stylesheet you want
+media queries basically set conditions based on features of the media
+
+eg media query
+
+<link rel="stylesheet" media="print and resolution > 150dpi" href="print150.css">
+
+the above applies a special sheet if the device has the required pixel density
+
+
+@media screen and (min-width : 480px) {
+  body {
+  font-size: 150%;
+  }
+} 
+
+
+^if the content is displayed on a screen and if the width of the display is at least 480px, 
+ the font-size of the body is 150%
+
+
+ detecting device orientation is relatively easy: 
+
+ @media screen and (orientation: portrait) {
+  #sidebar {
+    display: none;
+  }
+ }
+
+ @media screen and (orientation: landscape) {
+   #sidebar {
+    display: block;
+   }
+ }
+
+ ^only show the sidebar element when the page is displayed in landscape mode
+
+
+
+ its tough dealing with 2 different orientations, you cant cram 
+ a tall menu into a limited vertical space, it will lead to small buttons
+
+ a better solution is to have them automatically adjust themselves in a 2x2 grid if the space permits
+
+
+
+ when you run a web application in safari, the available screen space is reduced to the surrounding ui
+
+
+ for iphones: 
+
+  the ipod touch has a resolution of 320x480, but because of the safari ui, you can only really use
+  320x360 for the application
+
+
+  by adding a meta tag to index.html you can make safari recognize it as a web app and should
+  not be treated as a simple link
+
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  ^ios knows that when this page is bookmarked and launched form the home screen it must do so in full
+  screen mode without the usual safari interface
+
+  detecting standalone apps
+
+  safari provides an easy way to determine if the page is being viewed as a web app or a regular
+  web page
+
+
+
+  after you know how to detect the standalone web app, you can use that to modify the application accordingly, there is no built in way to do the detection in css,
+
+
+  Modernizr adds css classes to the html element id to indicate which features are supported
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
