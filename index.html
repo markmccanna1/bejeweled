@@ -19,7 +19,10 @@
     (max-device-width: 768px) and (orientation: portrait), screen and (max-device-width: 1024px)
     and (orientation: landscape)">
     <!-- this media query specifies that the style sheet should only be applied to screen devices that are at most 768 pixels wide in portrait mode and 1024 pixels wide in landscape mode -->
+  
+  <link rel="apple-touch-icon-precomposed" href="..">
 
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="..">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
 <body>
@@ -39,6 +42,10 @@
     </div>
     <div class="screen" id="game-screen"></div>
     <div class="screen" id="high-scores"></div>
+    <div class="screen" id="install-screen">
+      <h1 class="logo">Jewel <br>Warrior</h1>
+      <span>Click the bookmark button to install the game to your homescreen</span>
+    </div>
   </div>
 </body>
 </html>

@@ -136,7 +136,112 @@ the above applies a special sheet if the device has the required pixel density
 
   Modernizr adds css classes to the html element id to indicate which features are supported
 
-  
+
+
+
+
+  by default ios uses a tiny screenshot of the app when it generates an icon, naturally that wont 
+  always produce great results
+
+  with a special link you can specify an icon file to use instead of the screenshot
+
+  <link rel="apple-touch-icon" href="icon.png">
+
+  normally the os does some extra stuff to the image, to tell it to not be a faggot, use this instead:
+
+  <link rel="apple-touch-icon-precompoed" href="images/ios-icon.png">
+
+
+  because idevices have different resolutions, ios also supports application icons of varying sizes
+
+  if you create icons in different sizes, you can point to them in the html by adding a sizes parameter to the link element for each resolution you want to support
+
+
+  when the user launches the game in standalone mode and later exits the game, 
+
+  ios saves a picture of it, the next time the app is launched this image is displayed until the page
+  is loaded
+
+  all of the ios devices need an image that takes up the full screen minus the top 20 pixels that
+  are reserved for the native status bar
+
+  320X460 for the iphone and ipad
+
+  768x1004 for the ipad
+
+
+
+  on the ipad you can add an extra startup image for landscape mode, which would be 748x1004
+
+  specifying a startup image
+
+  <link rel="apple-touch-startup-image" href="images/ios-startup-748x1024.png" media="screen and (min-device-width: 768px) and (orientation: landscape)">
+
+  if you add multiple link elements the last element simply overrides all the others unless you specify a media query to target the specific devices
+
+
+
+
+all mobile devices use a standard 20px status bar at the top of the screen, even when the webapp is
+running in full screen mode its visible
+
+by adding a meta tag to the page, you can choose between a few different styles for the status bar
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+^toggles a solid black background on the status bar
+
+
+
+
+ideally, a game running in a wep app should be no different from native form 
+
+
+you want to disable overscroll
+
+you can do this by disabling touch scroll altogether
+
+
+
+the android browser doesnt have a feature like the meta tag that hides the safari ui
+
+when a page loads in the android browser, it is usually displayed in such a way that the url bar
+is still visible
+
+with JS you can make the address bar disappear, or at last move it out of the way
+
+the trick is to force the browser to scroll to the top of the page
+
+if theres enough content, it automatically pushes the address bar out of view
+because the height is set to 100%, the game only takes up as much space as it can, so scrolling to the top has no effect
+
+you can make sure the page is long enough by increasing the height of the html element
+
+mobile browsers have a few behaviors that are best left disabled for games
+
+
+when you keep your finger pressed down for a second or two on an image a small callout appears giving you the option to follow the link, save the image, etc
+
+the user should be able to tap and press anything without interference 
+
+this disables the callout 
+
+-webkit-touch-callout: none;
+
+
+
+-webkit-user-select: none;
+^disables the ability to select text and images 
+
+the android browser also highlights clickable elements when you tap them, which you can remove with
+
+-webkit-tap-highlight-color: rgba(0,0,0,0)
+
+under some circumstances, the browser automatically adjusts the size of the text to account for the change in available size
+
+you can disable automatic readjustment with
+
+-webkit-text-size-adjust: none;
+
 
 
 
