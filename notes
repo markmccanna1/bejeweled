@@ -246,6 +246,90 @@ you can disable automatic readjustment with
 
 
 
+ADDING SHIT TO THE GAME BOARD
+  necessary game logic
+  encapsulating the state of the board in an isolated module that allows modifications to the board only when all the game rules are followed
+  ensuring that the board automatically reacts to the swaps and rearranges the remaining jewels
+
+
+  there are some issues that arise when the game must be able to use two different sources that control the board
+
+  the single player experience relies on the local client side game logic
+
+  but the game must also work with a server side implementation of the same rules
+
+
+  the games mechanics are seperated from the display and input elements of the game
+
+  the board module is a data model for the games state(gem positions)
+
+  the only real function that it exposes is a query function for accessing the jewels on the board
+  and a function for swapping jewels
+
+  the swapping function attemts to sswap only a pair of jewels because jewels are swappable only if certain conditions are met
+
+  swapping also has consequences, jewels are removed, new ones fall
+
+  the board module handles all these things automatically
+
+  at some point, you can add webworkers to move the board logic to a seperate thread by creating
+  a web worker based bard module that exposes the same methods as the one created in this chapter
+
+  web workers communicate with the rest of the application via an asynchronous messaging api, which means that all the board modules must be able to function asynchronously 
+
+  if you wanted to have a module that validates board data with a server side backend, you need to send
+  an asynchronous ajax request to the server
+
+  every function that modifies the game state would require a trip to the server and back before the response could be given to the caller
+
+  in other words just because the function call returns, doesnt mean the result is ready
+
+
+  you can solve this problem of deferred response in several ways
+
+    one of the ways is using full-fledged custom event dispatching, or the concept of promise objects (node.js shit)
+
+    the simplest solution is to just provide a callback function as an argument to the relevant method, and have that method call the callback function when it is done
+
+  when you fill the board you have to be careful to fill the board in such a way that there are no
+  combinations when the board is initially created, that would result in the player getting points 
+  without doing anything
+
+
+after performing a swap, the game must search for chains to remove
+
+
+because the swap function needs to be exposed to the rest of the board, and because it potentially modifies the board, it mush work in the same asynchronous fashion as the initialize function
+
+besides the two sets of coords, swap takes a callback function as its 5th argument
+
+if the swap succeeds, the callback function is called with either a list of events that happened, or false (if its invalid)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
