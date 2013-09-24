@@ -1,3 +1,6 @@
+To solidly express what you learned from the book, go to the beginning of each chapter, he has a great 
+summary
+
 you can solve many of the problems of multiple display resolutions by using an elastic layout
 based on relative units, instead of absolute values
 
@@ -304,6 +307,350 @@ because the swap function needs to be exposed to the rest of the board, and beca
 besides the two sets of coords, swap takes a callback function as its 5th argument
 
 if the swap succeeds, the callback function is called with either a list of events that happened, or false (if its invalid)
+
+
+DELEGATING TASKS TO WEB WORKERS
+  how to use web workers to create a worker based version of the board module 
+
+javascript is single threaded by design, you cannot run things in parallel, anything you ask the
+browser to is processed in a serial manner. when you use functions like setTimeout or setInterval what youre really doing is pushing those functions onto the same event loop that the main thread uses
+
+one drawback to this is that you cannot have any function that blocks the execution and expect the browser to behave
+
+xmlhhttprequest obejct has synch and non sycnh modes, if you use synch requests, you tie up the thread,
+blocking any further execution until the request has finished
+
+web workers solve this problem by introducing functionality that resembles threads
+
+with web workers, you can load scripts and make them run in the background, independent from the main thread. a script that runs in a worker cannot affect or lock up the main thread (the browser window, which means you can do
+massive cpy intensive processing
+
+the web workers specification defines the functionality of workers as being
+thread-like because implementations dont necessariyl have to use actual OS-level threads
+
+theyre thread-like, not actual threads per say, since:
+  -the implementation of workers is up to browser vendors
+even though they are often mentioned in the same sentence as other html5 features, web workers
+are not part of the html5 specification but have their own specification.
+
+workers do have some limitations- 
+  in most cases these contraints dont pose problems as long as your code is encapsulated well and data
+  is isolated...
+
+
+1. the first isse is the seperation of state and data 
+    no data from the parent thread is accessible from the worker thread, or vice versa. 
+    any changes to the data of either thread must happen through the messaging API
+      this limitation actually helps a lot with avoiding nasty concurrency problems.
+    if workers could freely manipulate the variables in the parent thread, the risk of running into
+    problems such as deadlocks, and race conditions would make workers very tough
+
+2. no dom access
+    this seperation btween worker and parent thread also means that workers have no access to the DOM 
+    (window and document objects dont exist in them)
+    workers can however send messages to the main thread that are then used to change the dom
+    the messaging api doesnt restrict you from defining your own message protocol for updating certain
+    dom elements or exchanging information about the elements of the document.
+
+      if youre going to do alot of dom manipulation, its better to reconsider if that functionality should belong to a worker
+
+web workers are not supported in all browsers (IE is missing them, shocking)
+
+theyre also not supported on mobile browsers
+
+since this is the case, the best thing to do is make your use of workers optional
+
+
+what can workers do?
+  in general workers can do anything you would otherwise do with javascript
+
+  creating a worker simply loads a script and executes it in a background thread
+
+  in pure js you have access to a few extra methods
+
+  importScripts()
+    - you provide this function a list of paths that point to scripts you want to load
+    - the function is variadic, which means that you must specify the paths as individual arguments
+
+  importScripts('script1.js', 'script2.js', ....)
+
+
+  all these files are loaded synchronously, so the function doesnt return until all scripts loaded
+
+  after a script is loaded, it is executed within the same scope as the calling worker
+
+  this means that the script can use any variables and functions declared in the worker and the worker can subsequently use any variables and functions introduced by the imported script (allows for easy seperation of worker code into discrete modules)
+
+  the script that created the worker can terminate the worker when it is no longer needed, but the worker itself can also choose to exit
+
+  ( a worker can kill itself by calling the close() function)
+
+
+  the timer functions that you know from the window object are all available in worker threads, which means that you are free to use the following functions
+
+    setTimeout()
+    clearTimeout()
+    setInterval()
+    clearInterval()
+
+
+you can also use the xmlhttprequest object to create and process background ajax requests
+
+  this object is especially useful if you need a background worker that continuously pings the server for updates that are then relayed to the main thread via the api
+
+  because blocking in a worker thread does not affect the main ui thread, you can even do synchronous requests, which is normally a bad idea in non-worker code (it freezes the browser)
+
+
+  Websockets support in worker threads is a bit of a gray area.
+    eg. chrome allows it, but firefox only lets you use it in the main JS thread
+
+
+
+to create workers you use the worker constructor
+
+  var worker = new Worker('myworker.js')
+
+
+you can only create workers from scripts that have the same origin as the creating script
+  that means you cant refer to the scripts on other domains 
+  the script must also be loaded using the same scheme
+    - (the script cant use https if the page uses http)
+
+you also cant create workers from a script running locally
+
+when youre done using the worker you can call:
+
+ worker.terminate()
+
+this kills it an frees up memory
+
+
+you can create more than worker thread
+you can also create more than one worker from the same script
+  some tasks are well suited for this kind of parallelization, and can provide a performance boost
+  unfortunately workers are not meant to be created in large numbers due to the overhead cost
+  of setting them up, so keep it down to 1 or two workers
+
+
+
+SENDING MESSAGES -
+  workers and their parent communicate through a common messaging API
+  data is sent back and forth through strings, but that doesnt mean you can send only one string messages
+
+
+  if you send any complex structure such as an array or object, it is automatically converted to json
+
+  this automatic conversion of json allows you to build fairly advanced messages, but not that some things (like dom elements) cant be converted to json
+
+
+  in the creating thread, call the postMessage() method on the worker with the data that you want to send
+
+  //send a string
+  worker.postMessage('hello worker')
+  //send an array
+  worker.postMessage([0,1,2])
+  send an object literal
+  worker.postMessage({
+    command: 'pollServer',
+    timeout: 1000
+  })
+
+  in the same way, simply call postMessage() to send messages from the worker to the main thread
+
+  postMessage('im read to work master')
+
+
+
+
+RECEIVING MESSAGES
+
+  messages can be intercepted by listening for the message event.
+  in the parent thread, the event is fired on the worker object, whereas on the worker object, it is fired on the global object
+
+
+  to listen for messages from a worker, attach a handler to the message event
+
+  worker.addEventListener('message', function(event) {
+    //message received from the worker thread
+  }, false)
+
+
+  in the worker thread you listen for message events on the global object
+  addEventListener('message', function(event) {
+    //message received from the main thread
+  })
+
+  in both cases, you can message data in the data property on the event object.
+  its automatically encoded from json
+
+
+CATCHING ERRORS
+  if an error occurs in a worker thread, you might want to know about it in the main thread so that
+  you can display a message, create a log entry, and so forth.
+
+  in addition to the message event, worker objects also emit an error event, which is fired
+  if an error happens that is not caught in the worker thread
+
+  when the event fires, it is too late to do anything about the error. the worker has already stopped whatever it was doin, but at least you can be informed that the error occured
+
+  worker.addEventListener('error', function(error) {
+    alert('worker error: ' + error)
+  }, false)
+
+
+SHARED WORKERS
+  there are two types of web workers: dedicated, and shared.
+
+  shared workers can have multiple connections, they are not bound to one html page. 
+  if you have multiple html pages from the same origin running in the same browser, these pages can 
+  all access any shared workers created by one of the pages
+
+
+  to create a shared worker, use the SharedWorker() constructor.
+  in addition to the script path, this constructor also takes a second optional name parameter.
+  if the name parameter is not given, an empty string is used for the name.
+  if you attempt to create a shared worker and one has already been created with the same script and name, a new connection to that worker is created instead of a brand new worker
+
+  shared workers dont have a global message event like dedicated workers do.
+  instead they must listen for connect events that fire whenever a new page creates a connection to 
+  the worker
+
+  communication between the worker and connecting threads happens via port objects that emit message events and expose the postMessage() method
+
+  the port.start() function must also be called before messages can be received
+
+
+
+  look at this example:
+    it will use a dedicated worker to do some intensive processing, and freeing up the main thread
+
+
+    function isPrime(n){
+      if (n < 2) return false;
+      for (var i = 2, m=Math.sqrt(n); i <= m; i++)
+        if (n % i === 0) {
+          return false
+        }
+    }
+    return true
+    }
+
+
+  if a pair of divisors exists, one of the divisors must be smaller than or equal to the square root
+  of n, so you need to test only numbers in the range [2, sqrt(n)] to determine the primality of n
+
+  so for each number i from 2 to sqrt(n), you use the remainder operator to test whether i can divide n
+  if it can n is not prime and isPrime returns false
+
+  if the loop exits without finding a divisor, n is prime and returns true
+
+
+WHEN TO USE WEB WORKERS IN GAMES
+  do you need to move the game element to a seperate worker thread?
+  does the game element do anything that could run independently
+
+  does the game element depend on having access to the dom?
+
+  remember that worker threads cannot access the document, so anything to do with the dom must be in the main thread
+
+
+  good candidates are artificial intelligence, and physics simulations
+
+    theyre demanding on the cpu and dont need to run in the same thread as long as the data is kept synchronized
+
+THE WORKER MODULE
+  because the game module was designed with multiplayer support in mind it already has an asynchronous interface.
+
+
+
+
+importing the script the regular board module allows you to reuse  funcitonality
+ because the module is created in the jewel namespace, an empty jewel obect is created prior to importing the script if the object doesnt exist when the script is imported, youd get an error
+
+when the worker receives a message from the game, it needs to call the
+ appropriate method on the imported board module and post back the results
+ the messages coming from the game to the worker use a custom message format described
+ by this object literal:
+ 
+ {
+  id: number,
+  command: string
+  data: any
+ }
+
+ id identifies the mesage, the command property
+ is a string that determines what the worker should do
+ data is all the data the worker needs to do the command
+
+ all messages posted to the worker trigger a response message with this format:
+
+ {
+  id: number,
+  data: any,
+  jewels: array
+ }
+
+
+ the id is the id number from the original message, 
+ data is the response data, and jewels 
+ contains a 2d array that represents the current state of the jewel board
+ the board data is always attached so that the main thread can keep a local copy of the data for
+ easy access
+
+the worker has 2 commands, initialize and swap
+theyre mapped to the corresponding methods on the board module
+
+when the worker receives the initialize command, data must contain the settigs object from the jewel
+namespace in the parent
+
+
+the board initialize function takes a callback function as its first and only argument, a special
+callback function is defined in the worker and is passed to board.initialize and any other asynch
+board methods
+
+when the callback is called function is called, the data parameter is sent to the main thread as a message, and its then up the main thread to handle the callback message
+
+
+
+
+the worker defined the callback method, whenever anything happens that
+changes the state of the board (initialize, and swap), the worker 
+sends a message to the main thread 
+
+the game should be able to run with and without worker support
+
+  you need a new worker-based board module that has the same interface as the non-worker
+  board.js module
+
+any functions exposed in the board module must also exist in the worker board module with the same signiatures  (initialize(), swap(), getBoard() )
+
+
+if they have the same signatures, you can replace one module with the other, and 
+the game doesnt care
+
+you know that only some browsers support workers, the board board module (for the workers)
+
+must be loaded only if workers are available
+
+if not, the game must fall back to the regular board module
+
+
+when you use the worker constructor to create a new worker, the script is automatically pulled from the server
+
+it would be nice if the file were already in the cache so the user didnt have to wait for the additional http request before the game could begin
+
+if you simply added the script to the modernizr load call in the loader script, errors could occur because the worker script uses functions that are not available outside the worker (like importScripts() )
+
+
+you could test for the presence of that function and execute the rest of code only if it exists
+
+a more elegant method would be to just make sure the file is loaded and not executed
+
+yepnope uses something called prefixes - 
+  they enable you to define a prefix that if found in the script path, triggers extra functionality
+
+
+CREATING GRAPHICS WITH CANVAS
 
 
 
