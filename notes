@@ -652,6 +652,453 @@ yepnope uses something called prefixes -
 
 CREATING GRAPHICS WITH CANVAS
 
+the canvas element allows for developers to create dynamic graphics
+it provides a 2 dimensional drawing surface with a JS api for drawing shapes, paths, and objects
+
+it is so fully featured that it can create a near complete canvas based svg render
+
+a major difference between svg and canvas is that the canvas api does something called an 
+"immediate mode"
+this immediate mode allows any content drawn on the canvas is immediately rasterized and rendered
+to the surface
+
+rasterize - the process of converting a vector image into a bitmap image
+
+the canvas does not maintain any internal structure of the shapes and paths that ahve been drawn
+as soon as you tell the canvas to draw, it does the job and then forgets what the pixels represent
+
+this is different from an svg element, which has an xml structure that describes which elements make
+up the image
+
+
+canvas is really good when you need fine grained control over the input
+
+with pixel level data access, you can do things that are not possible with any other technology
+
+a disadvantage to canvas:
+
+  even if its drawing functions are vector based, its outputs are bitmaps which are subject to scaling
+  issues
+
+  howver, because all canvas based graphics are created programatically, you have the option
+  of creating them in the best resolution at runtime
+
+
+  there is actually an advantage to having bitmap based ouptut
+
+    you dont need to worry about how many times you add content to the canvas element, no matter how many
+    shapes and images you add, the canvas is always just a bitmap
+
+    you dont need to worry about filling the canvas element with too much content that could slow things
+    down
+
+
+
+
+you can create a canvas element the same way you can create other dom elements
+
+  var canvas = document.createElement('canvas')
+  document.body.append(canvas)
+
+
+or you can just use markup
+
+<canvas id="canvas"> </canvas>
+
+
+the markup creates a canvas element withthe default dimensions of 300x150
+
+when its created its fully transparent
+
+you can also add feedback by adding children to it
+
+<canvas> <h3> this requires a modern web browser </h3> </canvas>
+
+
+the browser only renders whats inside the canvas element if it doesnt support canvas
+
+theres an important concept to understand about canvas
+
+  it does not provide any graphics functionality itself, it just defines a surface and exposes a few properties for setting dimensions
+
+
+canvas.width = 400
+canvas.heigh = 300
+
+a canvas' dimensions are not necessarily equal to its CSS dimensions.
+
+You can scale a canvas element to any width and heigh using CSS without any effect to the actual
+dimensions of the canvas
+
+the contect is simpy stretched. (like a bitmap)
+
+
+when you add graphics to the surface, you have to do so using a context object created using
+the getContext() method on the canvas element
+
+var ctx = canvas.getContext('2d') //creates a 2d context object
+
+  for the getContext() method the parameter is a context type
+    these context types have different interfaces for creating graphics on the canvas
+    interface
+
+  right now, besides the 2d context, the only other context it accepts is the WebGL context
+
+
+many of the canvas functions use the same path API to define paths of points that make up the shape you
+want to draw
+
+you initiate a new path by calling the ctx.beginPath() method on the context object (ctx)
+  this also clears all previously added path data
+
+
+there are a few different methods for adding path segments
+  the most basic adds a line segment
+    ctx.beginPath()
+    ctx.moveTo(150,200)
+    //moveTo creates a new subpath with a single point at the specified coordinates
+    ctx.lineTo(250,200)
+    ctx.lineTo(250,230)
+    ctx.lineTo(150,230)
+    //the lineTo methods moves the position, adds a new point, and connects it to the previous position with a line
+    ctx.closePath()
+    //closes the path, it creates a final line segment from the current position to the position
+    //of the first point
+    //in this case it adds the fourth edge to a rectangle
+  
+    //close path is optional, you may not want to always close the path
+
+a path is made up of a number of subpaths.
+
+
+
+if you dont call moveTo to create a subpath it is automatically created when lineTo is called. 
+BUT, since there was no starting position defined, that lineTo method call only moves the posiition 
+and does not start a line
+
+you should not use the beginPath method to create additional subpaths because that function clears
+all path data before creating the new path
+
+if you want to add more subpaths to the current path, you use moveTo()
+
+if you have a defined path, you can draw it to the canvas surface
+  the canvas api has two different methods for converting the path to graphics
+    1. ctx.fill() - colors the inside
+    2. ctx.stroke() - colors the edges
+
+
+  the color for each of these methods is given by these 2 methods
+    ctx.fillStyle()
+    ctx.strokeStyle()
+
+  eg
+    ctx.fillStyle = '#aaeeaa'
+    ctx.strokeStyle = '#111155'
+
+the colors have the same format of css (rgb(), hexadecimal, keywords)
+
+
+you can also set the linewdith 
+
+  ctx.lineWidth = 5.0
+
+after youve set the path and defined fill and stroke styles, you can call either of the 2 methods
+  that convert paths to graphics
+    fill()
+    stroke()
+
+when you draw a strokeline around an object, the line is drawn so that the path is smack dab in the middle, which means that half the line is outside the shape, and half is inside
+
+if either the fill or stroke color is non-opaque it is usually a good idea to draw the transparent part first to avoid unwanted bleeding near the edge
+
+there is a small caveat with horizontal and vertical lines
+  since strokes are drawn with the path in the center, a 1 pixel wide vertical line ould have half a pixel on the left, and half on the right
+
+  you cant do that because there isnt such a thing as half a pixel. idiot. 
+  what ends up happening is that a semitransparent 2 pixel wide line is used instead
+
+  an easy fix for this is to add .5 to both the x and y coordinates of the points, making the line centered on a pixel
+
+
+
+  it would suck if you had to go through the procedure of pathing each time you wanted to create something
+
+
+  ctx.rect(x,x,x,x) 
+  ^ a shortcut, cool
+
+
+  ctx.beginPath()
+  ctx.rect(150,200,100,30)
+  ctx.fillStyle = 'rgba(sdfsdf)'
+  ctx.fill()
+
+
+  or you can just do 
+  ctx.fillStyle = 'rgba(234234)'
+  ctx.fillRect(150, 200,100,30)
+
+  or 
+  ctx.strokeStyle = 'rgba(234234)'
+  ctx.strokeRect(150, 200,100,30)
+
+
+
+  ctx.clearRect(150,200,100,30)
+  ^instead of drawing, it clears the area
+  all pixels in the specified rectablge are set to black with the alpha channel set to 0 (fully transparent)
+
+
+  if you want to clear the entire canvas you can just set the heigh or width property on the canvas element, even setting the value to itself triggers it
+
+  canvas.width = canvas.width
+
+
+BEzier curves
+
+ctx.quadraticCurveTo(cx,cy,x,y)
+
+^ this method takes 2 points as paramaters,
+  x,y refer to the startpoint of the cuve
+  cx, cy refer to the control point of the curve
+
+the control point essentially pulls the curve toward it
+
+check this out dawg
+
+ctx.beginPath()
+ctx.moveTo(50,200)
+ctx.quadraticCurveTo(425,25,450,200)
+
+this curve starts at 50, 200 and ends at 450,200, and the control point is 425,25
+
+
+the second curve method is called ctx.bezierCurveTo()
+
+this method creates a cubic bezier curve
+  cubic curves take two control points, 
+
+ctx.beginPath()
+ctx.moveTo(50,200)
+ctx.bezierCurveTo(150,25,350,350,400,200)
+
+with cubic curves you can easily add one after the other to form longer and more detailed curves
+
+just put the first control point of the following curve segment in the opposite direction of the last control point of the previous segments
+
+
+Clipping Paths
+
+use ctx.clip() to clip paths
+  this makes the current path act as a mask that is applied to all subsequent drawing functions
+
+  as long as the clipping path is active, only the area within that region is modified
+
+
+advanced stroke and fill styles
+
+  you can use a few additional paramters to control the appearance of a stroke
+
+  line caps-
+    ctx.lineCap property
+      there are 3 values:
+        1. butt: a clean perpendicular cut at the end of the stroke, the last point in the path is positioned in the center of the line cap
+
+        2. round: rounds the end of a stroke by drawing a semicircle with the center positioned at the
+        last point
+
+        3. square: looks like butt, only it extends so the last point is positioned in the center of a square
+
+
+  line joints - p 240
+    ctx.lineJoin property
+      it describes what to do whenever two consecutive path segments share the same point 
+        all three have the same starting condition
+      3 values:
+        1. bevel: this joint fills the triangle defined by the meeting point and the two outer corners
+
+        2. round: round builds on the bevel and smoothes out the joint by rendering an arc connecting
+        the outer corners
+
+        3. miter: the default value
+
+
+  gradients: 
+
+    strokes and fills dont have to be plain or solid
+      canvas supports both linear and radial gradients
+
+    to use gradients you have to create a gradient object
+      var gradient = ctx.createLinearGradient(50,50,250,400)
+        this creates a linear gradient along the line from 50,50 to 250,400
+
+
+    to create a radial gradient:
+      var gradient = ctx.createRadialGradiant(100,100,10,100,100,175)
+        this creates a radial gradient with an inner circle centered at 100,100, a radius of 10, 
+        and an outer circle in the same spot but with a radius of 175
+
+
+    both gradient objects expose an addColorStop() method thata you can use to assign colors to the gradient
+      gradient.addColorStop(0,'red')
+      gradient.addColorStop(.5, 'green')
+      gradient.addColorStop(1, 'blue')
+
+    ^this creates a gradient red at the start, the green, then blue
+
+    to use the gradient you have to assign it to either the fillStlye or strokeStyle property
+
+    Patterns
+      you can use an existing images for patterns, it can be a canvas element, a video element, or a regular image
+
+    var gradient = ctx.createPattern(
+      document.getElementById('myImage'),
+      'repeat'
+    )
+
+    the second argument specifies how the pattern should repeat,
+      repeat - default (repeats in both directions)
+      repeat-x - 
+      repeat-y
+      no-repeat
+
+    the pattern is anchored at the origin of the coordinate space and is not affected by where you use it
+
+
+    this means that a pattern created from a small image with no repetition may not be visible in the bottom right corner of the canvas
+
+
+    the ctx.createPattern() method returns a pattern object that has no properties or methods
+      just assign it to the strokeStyle or fillStyle
+
+
+TRANSFORMATIONS
+  when you create a new canvas element, the coordinate space used to draw content on it correspoonds to the dimensions of the canvas element.
+
+  the pixel in the upper left coordinate is 0,0
+  the pixel in the bottom right corner is (w - 1, h - 1)
+
+  the transformation matrix:
+    every point used by the canvas is multiplied by this matrix before it is used for rendering
+
+    the identity matrix: 
+
+    1 0 0
+    0 1 0
+    0 0 1
+
+    if you know what the fuck youre doing with matrices, 
+      you can set the transformation matrix using 
+        ctx.transform(a,b,c,d,e,f)
+        this method multiplies the current matrix with the matrix
+
+      you end up with
+
+      a c e
+      b d f
+      0 0 1
+
+
+    you can also use the set transform method to completely overwrite the matrix
+    (it essentially resets the matrix to the identity matrix and then multiplies it with your arguments
+    )
+       ctx = setTransform(a, b, c, d, e, f)
+
+
+TRANSLATING
+
+  the translate method object adds a translation matrix to the transformation
+
+  ctx.translate(x,y)
+
+  this basically adds the x and y value to the coordinate of any points you draw
+
+
+
+SCALING 
+  you can scale the cooridinate space using
+  ctx.scale(2, .5)
+
+  ^this cales the object to twice its width and half its height
+
+
+you can also achieve this same effect by appling this transformation:
+  ctx.transform(2,  0,
+                0, .5,
+                0,  0)
+
+
+a neat trick to scale the coordinate space so the entire canvas surface lies within 1 unit in the
+coordinate space is by scling the coordinate using the dimensions of the canvas
+
+ctx.scale(1 / canvas.width, 1 / canvas.height)
+
+^ after that, all coordinates are now relative to the dimensions, and all visible points
+on the canvas lie between 0 and 1 on both axes. for example, drawing a rectangle that fills the upper right quarter just requires:
+    ctx.fillRect(.5, 0, .5, .5)
+
+ROTATING:
+
+  ctx.rotate(t)
+
+  ^this method rotates the object t radians to the left
+
+
+adding text, images, and shadows
+
+you can also add txt and images to a canvas
+
+ctx.drawImage(image, dx, dy, dw, dh)
+  ^draws an image to the canvas, the upper left corner is dx, dy
+  if dw and dh are left out, they default to the images default dimensions
+
+Text drawn on the canvas cannt be seleted with a mouse, however you can provide the text as fallback
+content for the page
+
+
+
+how do you scale the jewel sizes so that you make sure the browser gets the right sized sprite?
+
+  you cant pass the information from css to js,
+    but you can style an html element and then pick up its dimensions with js
+
+
+if you can track the progress of the scripts loading, youll know when the user can move forward to
+the menu
+
+you can use a yepnope prefix to keep track of how many files have finished loading
+
+the purpose of the prefix is to track two things,
+how many files are being loaded and how many of those files have finished loading
+
+when you add a prefix to yepnope, the associated function is called
+once for each file with that prefix, this call happens before the file starts loading
+the loader! prefix first uses a simple regex to determine if the resource is an image file, and if it is, stops yepnope from trying to execute it as a script
+
+
+then a counter is incremented so that after the actual loading starts, numPreload equals the number
+of files that will be loaded
+
+prefix functions also allow you to attach a function to the autoCallback property of the resource object
+, this function is called when the fule finishes loading.
+
+
+the splash screen should show the loading progress of the game
+
+    getLoadProgress() returns a value between 0 and 1 indicating how far loaded it is
+
+
+  
+
+
+
+
+
+
+
+
+
+
 
 
 
