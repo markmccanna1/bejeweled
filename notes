@@ -1088,7 +1088,9 @@ the splash screen should show the loading progress of the game
     getLoadProgress() returns a value between 0 and 1 indicating how far loaded it is
 
 
-  
+
+
+google chrome doesnt allow 
 
 
 

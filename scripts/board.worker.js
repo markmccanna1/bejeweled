@@ -1,9 +1,9 @@
 var jewel = {}
 
 importScripts('board.js')
-
-
+  
 addEventListener('message', function(event) {
+  
   var board = jewel.board, 
   message = event.data
 

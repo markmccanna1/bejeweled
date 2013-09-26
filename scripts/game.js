@@ -8,7 +8,7 @@ jewel.game = (function() {
     var activeScreen = $('#game .screen.active')[0]
 
     screen = $('#' + screenId)[0]
-
+    
     if (activeScreen) {
       dom.removeClass(activeScreen, 'active')
     }
@@ -78,8 +78,7 @@ jewel.game = (function() {
     ctx = canvas.getContext('2d'),
     background = $('#game .background')[0],
     rect = background.getBoundingClientRect(),
-    gradient,
-    i
+    gradient, i
 
     canvas.width = rect.width
     canvas.height = rect.height

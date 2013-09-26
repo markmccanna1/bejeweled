@@ -117,7 +117,9 @@ window.addEventListener('load', function() {
       nope: 'loader!scripts/board.js'
     }, {
       load : [
+              'loader!scripts/display.canvas.js',
               'loader!scripts/screen.main-menu.js',
+              'loader!scripts/screen.game.js',
               'loader!images/jewels' + jewel.settings.jewelSize + '.png'
               ]
     }
