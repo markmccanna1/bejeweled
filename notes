@@ -1090,9 +1090,24 @@ the splash screen should show the loading progress of the game
 
 
 
-google chrome doesnt allow 
+google chrome doesnt allow web workers, you have to open Chrome using: 
+/Applications/GoogleChrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files
+
+^notice the renamed application
+
+the canvas is used in html5, if the browser doesnt suppport html5, you
+should have a css sprite fallback
+
+css sprites use several small images that you group together in one larger
+sprite 
+  use that larger image as the css background in a continer element
+  if the dimensions of the element are equal to those of a single sprite
+  only one image is ever visible
+  you can then use the css background position to switch between the various sprites in the sprite image 
 
 
+
+you can easily manage and modify css sprites via code, and they decrease loading time significantly due to the fewer number of http requests 
 
 
 

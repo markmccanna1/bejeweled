@@ -9,7 +9,7 @@ jewel.display = (function() {
 
 
   function drawJewel(type, x, y) {
-    // console.log('images/jewels' + jewelSize + '.png')
+  // console.log('images/jewels' + jewelSize + '.png')
     // console.log(type)
     var image = jewel.images['images/jewels' + jewelSize + '.png']
     // console.log(jewelSize)

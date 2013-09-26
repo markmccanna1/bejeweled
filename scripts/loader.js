@@ -101,23 +101,25 @@ window.addEventListener('load', function() {
 
   // stage 2
   if(Modernizr.standalone) {
+    // Modernizr.canvas = false
     Modernizr.load([
     {
-      load: [
-              'scripts/screen.main-menu.js'
-              // 'scripts/board.js'
-            ]
-    },
-    {
+      // you can simulate missing canvas support to trigger the DOM display be setting Modernizr.canvas to false
+      // before the loading starts, by doing so you override whatever value Modernizr decided on in its feature detection
+      test: Modernizr.canvas,
+      yep: 'loader!scripts/display.canvas.js',
+      nope: 'loader!scripts/display.dom.js'
+    },{
       //adding the preload prefix to the board.worker file tells the program
       // to load it but not execute it
       test: Modernizr.webworkers,
       yep: ['loader!scripts/board.worker-interface.js',
             'preload!scripts/board.worker.js'],
       nope: 'loader!scripts/board.js'
-    }, {
+    },{
       load : [
-              'loader!scripts/display.canvas.js',
+              // 'loader!scripts/screen.main-menu.js',
+              // 'loader!scripts/display.canvas.js',
               'loader!scripts/screen.main-menu.js',
               'loader!scripts/screen.game.js',
               'loader!images/jewels' + jewel.settings.jewelSize + '.png'
