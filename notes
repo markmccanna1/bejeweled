@@ -1111,8 +1111,156 @@ you can easily manage and modify css sprites via code, and they decrease loading
 
 
 
+INPUT
+
+mouse events on touch screens
+  There is one thing that doesnt translate well onto touch based devices
+    the hover state!!!
 
 
+the virtual keyboard
+  mobile devices have virtual keyboards that pop up when the user needs to input text
+    keyboard events such as keypress and keydown, keyup do go through javascript
+    so it is possible to map certain functions to keys on the keybaord
+
+the keyboard should really only be used for text input
+
+you can detect whether browsers support touch events by using Modernizr
+
+  if (Modernizr.touch) {
+
+  }
+
+or you can test if the ontouchstart property property exists on an element
+
+if ('ontouchstart' in document.createElement('div'))
+
+the touchstart event is fired whener the user places a finger on the screen.
+the other two touch events that you need to know about are touchmove and touchend
+
+the touchmove event fires when the user removes the finger
+
+these three touch events behave much like the mousedown mousmove and mousup events
+
+in most regards, touch events are just like any other event object, but they also carry mouseX and mouseY properties
+
+
+the event has a touches array
+  the array lists all active touches if more than one finger was touching the screen
+
+  the event object provides two additional lists that you can use to get around this problem
+
+
+in addition to touch events
+  browsers also support gestures
+
+  these events can be useful for pinch zoom
+
+  the 3 events are
+
+  gesturestart - fires when a second finger touches the screen
+  gesturechange - fires when one of the touch points moves
+  gestureend - 
+
+
+  gesturechange has interesting properties - it exposes scale and rotation properties
+
+  the scale value indicates the relative change in distance between the touch points since the gesturestart event
+
+  if the scale is equal to 2.0, the distance has doubled since the beginning
+
+  the rotation value indicates the number of degrees the touch points have rotated around their common center
+
+
+
+working with input events on the canvas can be a bit tricky
+
+  the canvas is after all, just a bitmap image
+
+  and the structure of the painted content isnt retained
+
+  you really cannot attach event handlers to anything other than the canvas element itself
+
+  therefore, if you want to add mouse or touch interactions to the canvas, 
+  you need to keep track of object positions yourself
+
+  that means youre going to attach a single event handler to the canvas element
+  then youre going to search the list of objects to see whether any of them should react
+
+  if the elements that have been drawn on the screen are all described by paths, you can save the path data
+  and use the ctx.isPointInPath() method to test whether a touch or mouse event is inside one of the paths
+
+
+
+when youre building the input module, keep in mind that its responsible for capturing input from two kidns
+of devices, mobile and desktop
+  touching a jewel with your finger or you mouse should both trigger the same select jewel event
+
+
+
+to create control bindings between input events and game actions, you give each input a keyword.
+  for example, mouse clicks have the input keyword click, a press of the enter key has the keyword KEY_ENTER and so on
+  the controls structure is stored in the game settings in load js
+
+  check it out dawg
+
+
+
+the inputHandlers object keeps track of the bindings between input events and game actions.
+
+for each game action, a property on the inputHandlers object is an array of all the handler functions associated with that action
+
+
+for example, inputHandlers['selectJewel'] holds all the functions you need to call when the selectJewel event happens
+
+
+the other function stub trigger() is for the function that does the function calling
+
+trigger just takes the action name as its argument and calls any functions in the corresponding array in inputHandlers
+
+if the trigger() is called with any additional arguments, they are passed on to the handler functions
+
+this way, handler functions can have acess to information such as coordinates in the case of mouse events
+
+
+
+
+jewel warrior supports three types of input, mouse, keyboard and touch
+
+  
+the touch event functionality is almost identical to the mouse vent handling
+instead of the mousdown event, you now listen for the touchstart event and use the input keyword TOUCH
+
+instead of passing the event object as the third argument to handlClick, you must no pass the relevant touch object 
+
+  event.targetTouches[0]
+
+
+because event obejcts and touch objects both store their coordinates in clientX and clientY properties and those are the only
+properties used in handleClick(), passing both objects is safe
+
+
+keyboard input
+
+  you can use a few different events to detect keystrokes 
+  the keydown keyup and keypress events all fire, but the various browsers dont always agree
+  on how to handle the keypress event 
+  and the keyup event just doesnt feel right
+
+  the event object that the keydown event triggers has a keycode property that holds the numeric code 
+  of the key that was pressed 
+
+
+  the alphabetical a-z keys have sequential codes, starting at 65 for the key a, and going up to 90 for the z key
+
+  
+
+the cursor object has 3 properties, the x and y properties are jewel coordinates, and the selected property is a boolean 
+value indicating whether the jewel is selected or if the cursor is just sitting passively at that position
+
+if the jewel is selected, the game tries to swap with the next activated jewel
+
+the trigger function is used by the dom to trigger actions
 
 
 

@@ -4,9 +4,27 @@ var jewel = {
     rows: 8,
     cols: 8,
     baseScore: 100,
-    numJewelTypes: 7
+    numJewelTypes: 7,
+
+    //using keywords like this makes it easy to change the game controls
+    // without having to modify the game code
+    // you can also enable user defined controls
+    // the bind function is used to attach handler functions to game actions
+    // whenever the input module detects some form of user input that should trigger
+    // that action, all the handler functions are called one by one
+    controls: {
+      KEY_UP : 'moveUp',
+      KEY_LEFT: 'moveLeft',
+      KEY_DOWN: 'moveDown',
+      KEY_RIGHT: 'moveRight',
+      KEY_ENTER: 'selectJewel',
+      KEY_SPACE: 'selectJewel',
+      CLICK: 'selectJewel',
+      TOUCH: 'selectJewel'
+    }
   },
   images : {}
+
 }
 
 window.addEventListener('load', function() {
@@ -112,14 +130,24 @@ window.addEventListener('load', function() {
     },{
       //adding the preload prefix to the board.worker file tells the program
       // to load it but not execute it
+
+      //this works
+      // test: Modernizr.webworkers,
+      // yep: ['loader!scripts/board.worker-interface.js',
+      //       'loader!scripts/board.js',
+      //       'preload!scripts/board.worker.js'],
+      // nope: 'loader!scripts/board.js'
+
+
       test: Modernizr.webworkers,
       yep: ['loader!scripts/board.worker-interface.js',
             'preload!scripts/board.worker.js'],
       nope: 'loader!scripts/board.js'
     },{
       load : [
-              // 'loader!scripts/screen.main-menu.js',
-              // 'loader!scripts/display.canvas.js',
+              'loader!scripts/screen.main-menu.js',
+              'loader!scripts/display.canvas.js',
+              'loader!scripts/input.js',
               'loader!scripts/screen.main-menu.js',
               'loader!scripts/screen.game.js',
               'loader!images/jewels' + jewel.settings.jewelSize + '.png'

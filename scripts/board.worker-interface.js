@@ -1,6 +1,18 @@
 //the worker must be told to call the initialize method on the real board module, 
 // to do so you must send messages to the message event handler 
 
+// the board errors out if there are no more combos left:
+// Uncaught TypeError: Object #<Object> has no method 'refill' screen.game.js:77
+// playBoardEvents screen.game.js:77
+// next screen.game.js:66
+// moveJewels display.canvas.js:23
+// playBoardEvents screen.game.js:71
+// next screen.game.js:66
+// playBoardEvents screen.game.js:80
+// next screen.game.js:66
+// removeJewels display.canvas.js:31
+// playBoardEvents screen.game.js:74
+// messageHandler
 
 // does the inclusion of the callback method make it asynchronous
 
@@ -22,7 +34,7 @@ jewel.board = (function() {
     worker = new Worker('scripts/board.worker.js')
     dom.bind(worker, 'message', messageHandler)
     //whats this callback?
-    post('initialize', settings, callback)
+    post('initialize', jewel.settings, callback)
   }
 
   //this method is triggered whenever the worker sends the main thread
@@ -41,7 +53,6 @@ jewel.board = (function() {
     if (callbacks[message.id]) {
       // this executes the callback and passes in the message data as a parameter
       callbacks[message.id](message.data)
-      console.log(callbacks[message.id](message.data))
       delete callbacks[message.id]
     }
   }
