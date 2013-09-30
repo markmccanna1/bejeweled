@@ -13,6 +13,4 @@ concepts.
 
 up next: 
 
-score
-node.js
-and moar
+keeping track of a players score, adding node.js, even moar!
